@@ -1,2 +1,3 @@
-# crm-batis-final
- CRM project with Telegram bot
+# CRM Telegram Bot
+
+A simple CRM bot using Telegram and Python.
