@@ -4,15 +4,17 @@ import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from services.customer_service import handle_customer_message
 
-TOKEN = os.getenv("BOT_TOKEN") or "PLACEHOLDER_TOKEN"
+# توکن مستقیم (در حالت لوکال یا ساده‌سازی اولیه استفاده میشه)
+TOKEN = "7847661218:AAEIHUcwg2gb7jF8zdK75w2Xk_exIewWAPU"
+
 bot = telegram.Bot(token=TOKEN)
 
 def start(update, context):
-    update.message.reply_text("سلام! به ربات CRM باتیس خوش اومدی 🌟")
+    update.message.reply_text("سلام! به ربات CRM خوش اومدی 🌟\nچطور می‌تونم کمکت کنم؟")
 
 def echo(update, context):
     user_message = update.message.text
-    response = handle_customer_message(user_message, update.message.chat_id)
+    response = handle_customer_message(user_message)
     update.message.reply_text(response)
 
 def main():
