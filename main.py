@@ -1,28 +1,29 @@
 import os
-import json
-import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import (
+    ApplicationBuilder, CommandHandler, MessageHandler,
+    ContextTypes, filters
+)
 from services.customer_service import handle_customer_message
 
-TOKEN = os.getenv("BOT_TOKEN") or "PLACEHOLDER_TOKEN"
-bot = telegram.Bot(token=TOKEN)
+BOT_TOKEN = os.getenv("BOT_TOKEN") or "توکن_اینجا"
 
-def start(update, context):
-    update.message.reply_text("سلام! به ربات خوش اومدی 🌟")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("سلام! به ربات خوش اومدی 💬")
 
-def echo(update, context):
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
-    user_id = update.message.chat_id
+    user_id = update.effective_user.id
     response = handle_customer_message(user_message, user_id)
-    update.message.reply_text(response)
+    await update.message.reply_text(response)
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text, echo))
-    updater.start_polling()
-    updater.idle()
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
 
-if __name__ == '__main__':
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+
+    app.run_polling()
+
+if __name__ == "__main__":
     main()
