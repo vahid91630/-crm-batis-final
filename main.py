@@ -1,29 +1,17 @@
-import os
-from telegram import Update
-from telegram.ext import (
-    ApplicationBuilder, CommandHandler, MessageHandler,
-    ContextTypes, filters
-)
-from services.customer_service import handle_customer_message
+from fastapi import FastAPI
+from routers import customer_router
+import uvicorn
 
-BOT_TOKEN = os.getenv("BOT_TOKEN") or "توکن_اینجا"
+app = FastAPI()
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("سلام! به ربات خوش اومدی 💬")
+# اتصال روت مخصوص مشتری‌ها
+app.include_router(customer_router.router, prefix="/customers")
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_message = update.message.text
-    user_id = update.effective_user.id
-    response = handle_customer_message(user_message, user_id)
-    await update.message.reply_text(response)
+# روت اصلی برای تست
+@app.get("/")
+def read_root():
+    return {"message": "به سیستم مدیریت مشتری خوش آمدید"}
 
-def main():
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
-    app.run_polling()
-
+# اجرای مستقیم با Uvicorn در حالت لوکال
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
